@@ -4,7 +4,7 @@
   "description": "This is a tool used to analyze user sentiment.",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint src",
+    "lint": "eslint .",
     "test": "jest"
   },
   "repository": {
