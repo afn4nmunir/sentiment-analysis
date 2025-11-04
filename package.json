@@ -1,0 +1,25 @@
+{
+  "name": "sentiment-analysis",
+  "version": "1.0.0",
+  "description": "This is a tool used to analyze user sentiment.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afn4nmunir/sentiment-analysis.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/afn4nmunir/sentiment-analysis/issues"
+  },
+  "homepage": "https://github.com/afn4nmunir/sentiment-analysis#readme",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "fs": "^0.0.1-security"
+  }
+}
