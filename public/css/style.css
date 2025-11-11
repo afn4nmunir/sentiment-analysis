@@ -1,0 +1,1029 @@
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0 0 60px 0; /* Added bottom padding to prevent footer overlap */
+  background-color: #f9f9f9;
+}
+
+header {
+  background-color: #2c3e50; /* Darker header */
+  padding: 20px 10px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border-bottom: 1px solid #34495e;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2.5em;
+  font-weight: 600;
+}
+
+.controls {
+  display: flex; /* Use flexbox for layout */
+  flex-wrap: wrap; /* Allow items to wrap onto the next line on smaller screens */
+  gap: 15px; /* Spacing between control groups (date, filters, search) */
+  padding: 10px; /* Padding inside the controls container */
+  background-color: #ffffff; /* White background for the controls bar */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1); /* Subtle shadow */
+  margin: 20px auto; /* Center the controls section horizontally with top/bottom margin */
+  max-width: 1400px; /* Limit the maximum width of the controls bar */
+  justify-content: space-between; /* Distribute space between the control groups */
+  align-items: center; /* Align items vertically in the center */
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+}
+
+.controls .date-range {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.controls .date-range label {
+  font-size: 1.1em;
+  color: #444;
+  font-weight: 500;
+}
+
+/* Date input styling */
+.controls .date-range input[type="date"] {
+  padding: 10px; /* Padding inside the date input */
+  border: 1px solid #ddd; /* Light grey border */
+  border-radius: 6px; /* Rounded corners */
+  font-size: 1em; /* Standard font size */
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); /* Subtle inner shadow */
+  height: 40px; /* Set height to match buttons */
+  box-sizing: border-box; /* Include padding/border in height calculation */
+}
+
+/* Styling for generic div containers within controls (used for checkbox groups) */
+/* This targets the divs directly inside .controls, like the filter checkboxes container */
+.controls div:not(.date-range):not(.keyword-search):not(.controls-middle-group) {
+  display: flex; /* Use flexbox */
+  gap: 10px; /* Spacing between items (e.g., checkbox and label) */
+  align-items: center; /* Align items vertically */
+}/* Styling for labels within generic div containers (specifically targeting filter labels) */
+.controls .controls-middle-group div label {
+  font-size: 1.1em; /* Slightly larger font */
+  color: #444; /* Dark grey text */
+}
+
+/* Styling for checkboxes */
+.controls input[type="checkbox"] {
+  margin: 0; /* Remove default margin */
+  cursor: pointer; /* Pointer cursor on hover */
+  border: 1px solid #ccc; /* Medium grey border */
+  border-radius: 3px; /* Slightly rounded corners */
+  width: 16px; /* Explicit width */
+  height: 16px; /* Explicit height */
+  vertical-align: middle; /* Align checkbox vertically with label */
+}
+
+/* General button styling within controls (applies to Filter and Search buttons) */
+.controls button {
+  background-color: #4CAF50; /* Default green background (Filter button) */
+  color: white; /* White text */
+  border: none; /* No border */
+  height: 40px; /* Explicit height */
+  padding-left: 20px; /* Horizontal padding */
+  padding-right: 20px;
+  border-radius: 6px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 1.1em; /* Slightly larger font */
+  transition: background-color 0.3s ease; /* Smooth background color transition on hover */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15); /* Subtle shadow */
+  display: inline-flex; /* Use inline-flex for alignment */
+  align-items: center; /* Center text vertically */
+  justify-content: center; /* Center text horizontally */
+  box-sizing: border-box; /* Include padding/border in height calculation */
+}
+
+/* Hover effect for general buttons */
+.controls button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+/* Specific styling for the search button (#search-btn) */
+#search-btn {
+  background-color: #007BFF; /* Blue background */
+  /* Height, padding, etc., are inherited from the general .controls button style */
+}
+
+/* Hover effect for the search button */
+#search-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Keyword search container styling */
+.controls .keyword-search {
+  display: flex; /* Use flexbox */
+  gap: 10px; /* Spacing between the input field and the search button */
+  align-items: center; /* Align items vertically */
+  flex-grow: 1; /* Allow this container to grow and take available horizontal space */
+  min-width: 200px; /* Minimum width to prevent excessive shrinking on small screens */
+}
+
+/* Keyword search input styling */
+.controls .keyword-search input[type="text"] {
+  padding: 10px; /* Padding inside the input field */
+  border: 1px solid #ddd; /* Light grey border */
+  border-radius: 6px; /* Rounded corners */
+  font-size: 1em; /* Standard font size */
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); /* Subtle inner shadow */
+  flex-grow: 1; /* Allow the input field to grow and fill the container */
+  height: 40px; /* Match button height */
+  box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+/* Container for the middle group of controls (filters) */
+.controls .controls-middle-group {
+    display: flex;
+    gap: 15px; /* Spacing between filter items and button */
+    align-items: center;
+}
+
+.main-container {
+  display: flex;
+  gap: 25px;
+  padding: 0; /* --- REMOVED PADDING --- */
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  align-items: stretch;
+  max-width: 1400px;
+  margin: 20px auto; /* Standardized margin */
+  /* border: 1px solid blue; */ /* --- DEBUG BORDER REMOVED --- */
+}
+
+.left-div {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  min-width: 280px;
+}
+
+.left-div .subreddit-select-container{
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 15px; /* Keep inner padding */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.left-div .subreddit-select-container .postCount-title-large{
+  font-size: 1.2em;
+  color: #555;
+  margin-bottom: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+#subreddit-select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+  width: 100%;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  box-sizing: border-box;
+}
+
+.left-div .post-comments-count-container{
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.dashboard-box {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 10px; /* Keep inner padding */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  flex: 1;
+}
+
+.dashboard-box .postCount-title {
+  font-size: 1em;
+  color: #555;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.dashboard-box .postCount-number {
+  font-size: 2.2em;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.dashboard-box-wide {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 10px; /* Keep inner padding */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.dashboard-box-wide .postCount-title {
+  font-size: 1em;
+  color: #555;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.dashboard-box-wide .postCount-number-wide {
+  font-size: 3em;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.dashboard-box-large {
+  background-color: white;
+  border-radius: 12px;
+  padding: 10px; /* Keep inner padding */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.dashboard-box-large  .postCount-title-large{
+  font-size: 1.2em;
+  color: #555;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+#sentimentPieChart {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+}
+
+.right-div {
+  flex: 7;
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+.tab-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+  /* Add padding to align tab content with controls content */
+  padding-left: 10px;
+  padding-right: 10px;
+  box-sizing: border-box;
+}
+
+.tab-button {
+  padding: 10px 10px;
+  border: none;
+  background-color: transparent;
+  font-size: 0.85em;
+  color: #333;
+  cursor: pointer;
+  transition: border-bottom 0.3s ease, color 0.3s ease;
+  font-weight: 500;
+  margin-bottom: -2px;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-button.active {
+  border-bottom: 3px solid #4CAF50;
+}
+
+.tab-button:hover {
+  border-bottom: 3px solid #4CAF50;
+  color: #222;
+}
+
+.chart-section {
+  display: none;
+  background-color: white;
+  border-radius: 12px;
+  padding: 10px; /* Keep inner padding */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 25px;
+  /* Add margin to align chart sections with controls content */
+  margin-left: 10px;
+  margin-right: 10px;
+  box-sizing: border-box;
+}
+
+.chart-section.active {
+  display: block;
+}
+
+.chart-section h3 {
+  margin-top: 0;
+  font-size: 1.6em;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+#weightedSentimentChart,
+#stackedSentimentChart,
+#totalCommentsChart,
+#engagementScoreChart,
+#authorsChart,
+#timeSeriesChart {
+  width: 100%;
+  height: auto;
+}
+.chart-controls{
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.chart-controls button{
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.chart-controls button:hover{
+   background-color: #2980b9;
+}
+
+.chart-controls span{
+  font-size: 0.9em;
+  color: #777;
+}
+
+.chart-description{
+  font-size: 0.95em;
+  color: #555;
+  text-align: left;
+  line-height: 1.7;
+}
+
+#topPosts .card {
+  border: none;
+  padding: 0; /* Keep inner padding */
+}
+
+#topPosts label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 1em;
+  color: #555;
+  font-weight: 600;
+}
+
+#topPosts select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+  width: 100%;
+  max-width: 350px;
+  margin-bottom: 20px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+}
+
+#topPosts #postListContainer {
+  font-size: 0.95em;
+  color: #555;
+  line-height: 1.6;
+}
+
+
+#post-details-container {
+  background-color: white;
+  border-radius: 12px;
+  padding: 10px; /* Add padding back here for inner content */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin: 20px auto; /* Standardized margin */
+  max-width: 1400px;
+  box-sizing: border-box;
+  /* border: 1px solid green; */ /* --- DEBUG BORDER REMOVED --- */
+}
+
+#post-details {
+  font-size: 1em;
+  color: #555;
+  line-height: 1.6;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #f5f5f5;
+  font-size: 0.9em;
+  text-align: center;
+  padding: 15px 20px;
+  border-top: 1px solid #ddd;
+  z-index: 1000;
+  box-sizing: border-box;
+  color: #555;
+  margin-top: 20px; /* This might get hidden by fixed footer, added padding-bottom to body */
+}
+
+footer div {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+footer p {
+  margin: 0;
+}
+
+/* ========================================= */
+/* == NEW STYLES (Extracted from JS) ====== */
+/* ========================================= */
+
+/* --- Tab Styles --- */
+.tab-button {
+  /* Base styles already exist */
+  border-bottom: 3px solid transparent; /* Default border */
+  font-weight: normal; /* Default font weight */
+  transition: border-bottom 0.3s ease, color 0.3s ease, font-weight 0.3s ease; /* Added font-weight transition */
+}
+
+.tab-button.active {
+  /* Styles for the active tab button */
+  border-bottom-color: #4CAF50; /* Active border color */
+  font-weight: 500; /* Active font weight */
+  color: #222; /* Optional: Darker color for active tab */
+}
+
+.tab-button:hover:not(.active) {
+   /* Hover styles for non-active tabs */
+   color: #007BFF; /* Hover color */
+   /* border-bottom-color: #9cdcfe; Optional: subtle hover border */
+}
+
+/* Tab Content Visibility */
+.tab-content { /* Add this class to your tab content divs in HTML */
+  display: none; /* Hide by default */
+}
+
+.tab-content.active {
+  display: block; /* Show active tab content */
+}
+
+/* --- Reset Zoom Button Hover --- */
+/* Assuming reset buttons have a common class or use the existing selector */
+[id^="resetZoom"]:hover {
+    filter: brightness(90%);
+}
+/* No need for mouseout rule, default state is brightness(100%) */
+
+
+/* --- Post Details Styling (fetchAndDisplayPostDetails) --- */
+
+/* Wrapper for the entire post details section */
+.post-details-wrapper {
+    padding: 25px 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e7eaf3;
+}
+
+/* Message styles (used for loading, errors, info) */
+.details-message {
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px; /* Add some spacing */
+    text-align: center;
+}
+.details-message.loading {
+    color: #555;
+    background-color: #f0f0f0; /* Light grey */
+}
+.details-message.error {
+    background-color: #f8d7da; /* Light red */
+    border: 1px solid #f5c2c7;
+    color: #842029; /* Dark red */
+}
+.details-message.error-partial { /* For less severe errors like missing post/comment */
+     background-color: #fff3cd; /* Light yellow */
+     border: 1px solid #ffeeba;
+     color: #664d03; /* Dark yellow */
+     margin: 10px 0; /* Smaller margin */
+     padding: 10px;
+     font-style: italic;
+}
+.details-message.info {
+    background-color: #e9ecef; /* Light grey/blue */
+    border: 1px solid #dee2e6;
+    color: #495057; /* Dark grey */
+}
+
+/* Post Title */
+.post-details-title {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.8em;
+    color: #2c3e50;
+}
+.post-details-title a {
+    color: inherit;
+    text-decoration: none;
+}
+.post-details-title a:hover {
+    color: #3498db; /* Hover color for title link */
+    text-decoration: underline;
+}
+
+/* Post Metadata */
+.post-details-meta {
+    font-size: 0.9em;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+    border-bottom: 1px dashed #ecf0f1;
+    padding-bottom: 10px;
+}
+
+/* Post Badges Container */
+.post-details-badges {
+    margin-bottom: 25px;
+}
+
+/* Post Summary */
+.post-details-summary {
+    background-color: #ecf0f1;
+    border-left: 5px solid #3498db;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    border-radius: 5px;
+}
+.summary-title {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #2980b9;
+    font-weight: 600;
+}
+.summary-text {
+    font-size: 0.95em;
+    color: #34495e;
+    line-height: 1.6;
+    margin: 0; /* Remove default paragraph margin */
+}
+
+/* Post Body */
+.post-details-body-container {
+    margin-bottom: 30px;
+}
+.body-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #555;
+    font-weight: 600;
+}
+.body-content {
+    font-size: 1.0em;
+    color: #333;
+    line-height: 1.7;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    word-wrap: break-word; /* Prevent long strings from breaking layout */
+}
+
+/* Post Comments */
+.post-details-comments-title {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #eee;
+    color: #555;
+    font-weight: 600;
+}
+.no-comments-message {
+    color: #7f8c8d;
+    font-style: italic;
+}
+.post-details-comment {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.comment-meta {
+    font-size: 0.85em;
+    color: #6b7280;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+.comment-body {
+    font-size: 0.95em;
+    color: #1f2937;
+    line-height: 1.6;
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 3px solid #d1d5db;
+    word-wrap: break-word; /* Prevent long strings */
+}
+.comment-badges {
+    margin-bottom: 10px;
+}
+
+
+/* --- Post List Table --- */
+.post-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.post-list-table th,
+.post-list-table td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+.post-list-table th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+}
+.post-list-row {
+    cursor: pointer; /* Add cursor pointer */
+    transition: background-color 0.2s ease;
+}
+.post-list-row:hover {
+    background-color: #f5f5f5; /* Hover background */
+}
+.post-list-row.selected {
+    background-color: #e8f4fd; /* Selected background */
+    font-weight: 500;
+}
+.no-posts-message {
+    color: #7f8c8d;
+    font-style: italic;
+    margin-top: 15px;
+}
+
+/* --- Category/Date Details View (fetchAndDisplayPostsByCategoryAndDate) --- */
+.category-date-details-wrapper {
+    padding: 25px 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #e7eaf3;
+}
+.category-date-title {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+.category-date-title .category-name {
+    color: #3498db; /* Specific color for category */
+}
+.category-date-title .date-info {
+    color: #7f8c8d; /* Specific color for date */
+    font-weight: normal;
+    font-size: 0.9em;
+}
+
+.posts-section-title,
+.comments-section-title {
+    margin-top: 0; /* Reset top margin for first section */
+    margin-bottom: 15px;
+    color: #34495e;
+    font-size: 1.4em;
+}
+
+.comments-section-title {
+     margin-top: 30px; /* Add top margin only for comments section */
+     padding-top: 25px; /* Add top padding */
+     border-top: 1px solid #eee; /* Add top border */
+}
+
+/* Specific post/comment item styling within this view */
+.category-post-item,
+.category-comment-item {
+    background-color: #fdfdfe; /* Slightly different bg for posts */
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.category-comment-item {
+     background-color: #f9fafb; /* Slightly different bg for comments */
+     border: 1px solid #e5e7eb;
+     border-radius: 6px;
+     padding: 15px;
+     margin-bottom: 15px;
+     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Style shared elements within category/date view items */
+.category-post-item .post-title,
+.category-comment-item .comment-meta { /* Use common classes if possible */
+    margin-top: 0;
+}
+.category-post-item .post-title a {
+    color: #2980b9;
+    text-decoration: none;
+    font-size: 1.2em; /* Match previous inline */
+    margin-bottom: 5px; /* Match previous inline */
+}
+.category-post-item .post-title a:hover {
+    text-decoration: underline;
+}
+.category-post-item .post-meta {
+     font-size: 0.85em; /* Match previous inline */
+     color: #7f8c8d;
+     margin-bottom: 15px; /* Match previous inline */
+}
+.category-post-item .post-body-excerpt {
+    font-size: 0.95em; /* Match previous inline */
+    color: #34495e;
+    line-height: 1.6;
+    margin-bottom: 15px; /* Match previous inline */
+    max-height: 70px; /* Match previous inline */
+    overflow: hidden;
+    text-overflow: ellipsis;
+     word-wrap: break-word;
+}
+.category-post-item .post-badges {
+    margin-bottom: 10px; /* Match previous inline */
+}
+
+.category-comment-item .comment-meta {
+    font-size: 0.85em; /* Match previous inline */
+    color: #6b7280;
+    margin-bottom: 8px; /* Match previous inline */
+}
+.category-comment-item .parent-post-title {
+    font-style: italic; /* Match previous inline */
+}
+.category-comment-item .comment-body {
+    font-size: 0.95em; /* Match previous inline */
+    color: #1f2937;
+    line-height: 1.6;
+    margin-bottom: 10px; /* Match previous inline */
+    padding-left: 10px; /* Match previous inline */
+    border-left: 3px solid #d1d5db; /* Match previous inline */
+     word-wrap: break-word;
+}
+.category-comment-item .comment-badges {
+    margin-bottom: 10px; /* Match previous inline */
+}
+
+/* Buttons within category/date view */
+.category-post-item .view-full-post-btn,
+.category-comment-item .view-full-post-btn {
+    margin-top: 5px;
+    padding: 6px 14px;
+    font-size: 0.9em;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.category-post-item .view-full-post-btn {
+     background-color: #3498db; /* Blue for post button */
+}
+.category-post-item .view-full-post-btn:hover {
+    background-color: #2980b9;
+}
+.category-comment-item .view-full-post-btn {
+     background-color: #5dade2; /* Lighter blue for comment button */
+}
+.category-comment-item .view-full-post-btn:hover {
+    background-color: #4ba8d8;
+}
+
+
+/* --- Author Details View (fetchAndDisplayPostsAndCommentsByAuthor) --- */
+.author-details-wrapper {
+    padding: 25px 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #e7eaf3;
+}
+.author-details-title {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Use common classes defined above for sections/titles/messages */
+/* .posts-section-title, .comments-section-title, .no-posts-message, .no-comments-message */
+
+/* Specific item styling for author view */
+.author-post-item {
+    background-color: #fdfdfe;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.author-comment-item {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Apply styles using common classes where possible */
+.author-post-item .post-title {
+    margin-top: 0; margin-bottom: 5px; font-size: 1.2em;
+}
+.author-post-item .post-title a { color: #2980b9; text-decoration: none; }
+.author-post-item .post-title a:hover { text-decoration: underline; }
+.author-post-item .post-meta { font-size: 0.85em; color: #7f8c8d; margin-bottom: 15px; }
+.author-post-item .post-body-excerpt {
+    font-size: 0.95em; color: #34495e; line-height: 1.6; margin-bottom: 15px;
+    max-height: 100px; overflow: hidden; text-overflow: ellipsis; word-wrap: break-word;
+}
+.author-post-item .post-badges { margin-bottom: 10px; }
+.author-post-item .view-full-post-btn {
+     margin-top: 5px; padding: 6px 14px; font-size: 0.9em; background-color: #3498db;
+     color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease;
+}
+.author-post-item .view-full-post-btn:hover { background-color: #2980b9; }
+
+.author-comment-item .comment-meta { font-size: 0.85em; color: #6b7280; margin-bottom: 8px; }
+.author-comment-item .parent-post-title { font-style: italic; }
+.author-comment-item .comment-body {
+    font-size: 0.95em; color: #1f2937; line-height: 1.6; margin-bottom: 10px;
+    padding-left: 10px; border-left: 3px solid #d1d5db; word-wrap: break-word;
+}
+.author-comment-item .comment-badges { margin-bottom: 10px; }
+.author-comment-item .view-full-post-btn { /* Includes view-thread-btn */
+     margin-top: 5px; padding: 6px 14px; font-size: 0.9em; background-color: #5dade2;
+     color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease;
+}
+.author-comment-item .view-full-post-btn:hover { background-color: #4ba8d8; }
+
+
+/* --- Keyword Search Results (displaySearchResults) --- */
+.search-results-wrapper {
+    padding: 25px 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #e7eaf3;
+}
+.search-results-wrapper.no-results { /* Specific style for no results */
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+     box-shadow: none; /* Less prominent */
+}
+
+.search-results-title {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+.search-results-wrapper.no-results .search-results-title { /* Style title for no results */
+     margin-bottom: 15px;
+     font-size: 1.6em;
+     color: #495057;
+     border-bottom: none; /* No border if no results */
+     padding-bottom: 0;
+}
+.search-no-results-message {
+    color: #6c757d;
+    font-size: 1.1em;
+    margin: 0;
+}
+
+/* Use common classes: .posts-section-title, .comments-section-title */
+.comments-section-title.with-separator {
+    border-top: 1px solid #eee;
+    padding-top: 25px;
+    margin-top: 30px;
+}
+
+/* Search Item Cards (common style for post/comment results) */
+.search-item-card {
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.search-result-post.search-item-card {
+     background-color: #fdfdfe;
+     border: 1px solid #e9ecef;
+}
+.search-result-comment.search-item-card {
+     background-color: #f9fafb;
+     border: 1px solid #e5e7eb;
+     border-radius: 6px; /* Slightly different radius */
+     padding: 15px;
+     margin-bottom: 15px;
+     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Use common post/comment element classes: .post-title, .post-meta, .post-body-excerpt, .post-badges, .comment-meta, .parent-post-title, .comment-body, .comment-badges */
+/* Apply styles defined previously */
+
+/* Buttons in search results */
+.search-item-card .view-full-post-btn {
+    margin-top: 5px;
+    padding: 6px 14px;
+    font-size: 0.9em;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.search-result-post.search-item-card .view-full-post-btn {
+    background-color: #3498db;
+}
+.search-result-post.search-item-card .view-full-post-btn:hover {
+    background-color: #2980b9;
+}
+.search-result-comment.search-item-card .view-full-post-btn { /* Includes view-thread-btn */
+    background-color: #5dade2;
+}
+.search-result-comment.search-item-card .view-full-post-btn:hover {
+    background-color: #4ba8d8;
+}
+
+
+/* --- Badges Containers --- */
+.shields-container {
+    margin-top: 5px; /* Common margin */
+    display: flex; /* Arrange badges horizontally */
+    flex-wrap: wrap; /* Allow wrapping */
+    gap: 4px; /* Spacing between badges */
+}
+.shields-container img {
+    vertical-align: middle; /* Align badges nicely */
+}
+
+/* --- Filter Visibility --- */
+/* Assume the inputs/labels are wrapped in divs with these IDs */
+#iit-filter-container,
+#tp-related-filter-container {
+    /* Base styles if needed */
+    transition: opacity 0.3s ease, max-height 0.3s ease; /* Smooth transition */
+    overflow: hidden; /* Needed for max-height transition */
+    max-height: 50px; /* Adjust as needed */
+    opacity: 1;
+    display: inline-flex; /* Or flex, depending on layout */
+    align-items: center;
+    gap: 5px; /* Space between checkbox and label */
+}
+
+.filter-hidden {
+    opacity: 0;
+    max-height: 0;
+    /* Optionally add margin/padding 0 if needed */
+    margin: 0;
+    padding: 0;
+    border: none; /* Hide any borders */
+     /* Use display: none; if transitions are not desired */
+     /* display: none; */
+}
+
+.filter-visible {
+   /* Styles are mostly handled by the default state */
+   opacity: 1;
+   max-height: 50px; /* Or appropriate height */
+   /* display: inline-flex; Re-apply display if using display: none; for hidden */
+}
+
+/* --- Highlighted Search Term --- */
+mark {
+  background-color: #fcf8e3; /* Light yellow background */
+  padding: 0.1em 0.2em;
+  border-radius: 3px;
+  color: #8a6d3b; /* Dark yellow text */
+  font-weight: 600;
+}
