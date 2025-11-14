@@ -1,6 +1,6 @@
 export default [
     {
-      ignores: ["**/*.py", "crawler/**", "venv/**", "node_modules/**"],
+      ignores: ["public/", "**/*.py", "crawler/**", "venv/**", "node_modules/**"],
     },
     {
       files: ["**/*.js"],
