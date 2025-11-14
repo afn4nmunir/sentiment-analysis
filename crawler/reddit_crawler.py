@@ -33,6 +33,6 @@ def save_to_json(data, filename="reddit_output.json"):
     print(f"✅ Saved output to {filename}")
 
 if __name__ == "__main__":
-    posts = fetch_posts("singapore", limit=30)
+    posts = fetch_posts("TemasekPoly", limit=30)
     print(posts)
     save_to_json(posts)
