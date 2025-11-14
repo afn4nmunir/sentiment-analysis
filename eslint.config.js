@@ -1,6 +1,6 @@
 export default [
     {
-      ignores: ["node_modules/"],
+      ignores: ["node_modules/", "dist/", "venv/", "crwaler/"],
     },
     {
       files: ["**/*.js"],
@@ -9,7 +9,7 @@ export default [
         sourceType: "module",
       },
       rules: {
-        semi: "error",
+        semi: ["error", "always"],
         quotes: ["error", "double"],
       },
     },

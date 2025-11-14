@@ -2,6 +2,8 @@ import praw
 import json
 import datetime
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 ## setx REDDIT_CLIENT_ID "NGN02WHJGpwe-BrK2_y32Q" setx REDDIT_CLIENT_SECRET "h6hNZGuJxoPic05y6-F8YEcp6pZFvQ"
 def load_reddit_client():
