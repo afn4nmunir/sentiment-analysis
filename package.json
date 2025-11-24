@@ -25,7 +25,11 @@
   "dependencies": {
     "body-parser": "^2.2.0",
     "express": "^5.1.0",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "node.js": "^0.0.1-security",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.10.3"
   },
   "devDependencies": {
     "eslint": "^9.39.1",
