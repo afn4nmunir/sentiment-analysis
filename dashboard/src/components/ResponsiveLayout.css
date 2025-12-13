@@ -1,0 +1,109 @@
+/* ResponsiveLayout */
+/* Layout reset */
+.layout {
+    width: 100%;
+    font-family: Arial, sans-serif;
+}
+
+/* TOPBAR (desktop) */
+.topbar {
+    position: fixed;
+    height: 60px;
+    width: 100%;
+    background: #1e293b;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 0px;
+    justify-content: space-between;
+}
+
+.topbar .logo {
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 20px;
+}
+
+.top-nav {
+    display: flex;
+    gap: 20px;
+    padding-right: 20px;
+}
+
+.top-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* MOBILE HAMBURGER (hidden on desktop) */
+.hamburger {
+    background: none;
+    border: none;
+    font-size: 26px;
+    color: white;
+    cursor: pointer;
+    display: none;
+    padding-right: 20px;
+}
+
+/* SIDEBAR (mobile only) */
+.sidebar {
+    position: fixed;
+    top: 60px;
+    left: -300px;
+    width: 240px;
+    height: 100%;
+    background: #111827;
+    padding: 20px;
+    transition: left 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+/* Main content */
+.content {
+    padding: 20px;
+    transition: filter 0.25s;
+}
+
+.content.blur {
+    filter: brightness(0.5);
+}
+
+/* ---------------------------- */
+/* RESPONSIVE BREAKPOINT BELOW */
+/* ---------------------------- */
+
+@media (max-width: 850px) {
+
+    /* Hide desktop nav on mobile */
+    .top-nav {
+        display: none;
+    }
+
+    /* Show hamburger on mobile */
+    .hamburger {
+        display: block;
+    }
+}
+
+/* Desktop: hide sidebar completely */
+@media (min-width: 850px) {
+    .sidebar {
+        display: none;
+    }
+}
+
+/* ---------------------------- */

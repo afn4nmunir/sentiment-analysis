@@ -1,4 +1,5 @@
 import React from "react";
+import "./SentimentDashboard.css";
 
 export default function SentimentDashboard() {
     return (
@@ -8,7 +9,7 @@ export default function SentimentDashboard() {
             <h2 style={styles.header}>Sentiment Dashboard</h2>
 
             {/* Grid - switches to column on mobile */}
-            <div style={styles.grid}>
+            <div className={"dashboard-grid"}>
 
                 {/* Donut Chart Card */}
                 <div style={styles.card}>

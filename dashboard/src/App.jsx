@@ -4,33 +4,24 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import SentimentDashboard from "./components/SentimentDashboard";
+import ResponsiveLayout from "./components/ResponsiveLayout";
 
 export default function App() {
   return (
-    
+
     <BrowserRouter>
       <Routes>
-      <Route path="/" element={<Login />} />
+        <Route path="/" element={<Login />} />
 
-      <Route
-        path="/dashboard"
-        element={
-          <div className="layout">
-            <Sidebar />
-            <SentimentDashboard />
-          </div>
-        }
-      />
+        <Route
+          path="/dashboard"
+          element={
+            <ResponsiveLayout>
+              <SentimentDashboard />
+            </ResponsiveLayout>
+          }
+        />
 
-      <Route
-        path="/settings"
-        element={
-          <div className="layout">
-            <Sidebar />
-            <Settings />
-          </div>
-        }
-      />
       </Routes>
     </BrowserRouter>
   );
