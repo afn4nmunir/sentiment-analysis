@@ -3,9 +3,12 @@ import json
 import datetime
 import os
 from dotenv import load_dotenv
+import boto3
 load_dotenv()
 
-## setx REDDIT_CLIENT_ID "NGN02WHJGpwe-BrK2_y32Q" setx REDDIT_CLIENT_SECRET "h6hNZGuJxoPic05y6-F8YEcp6pZFvQ"
+#---------------------
+# 1. Reddit Crawler
+#---------------------
 def load_reddit_client():
     return praw.Reddit(
         client_id=os.getenv("REDDIT_CLIENT_ID"),
@@ -29,12 +32,37 @@ def fetch_posts(subreddit_name, limit=50):
         })
     return posts
 
-def save_to_json(data, filename="reddit_output.json"):
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
-    print(f"✅ Saved output to {filename}")
+#-------------------
+# 2. Upload to S3
+#-------------------
+def upload_to_s3(data, subreddit_name):
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+        region_name="ap-southeast-1"
+    )
 
+    today = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
+    filename = f"reddit_{subreddit_name}_{today}.json"
+
+    bucket = "mp-ito-ingestion-ammar"
+    key = f"raw/reddit/{today}/{filename}"
+
+    s3.put_object(
+        Bucket=bucket, 
+        Key=key, 
+        Body=json.dumps(data, indent=4),
+        ContentType="application/json"
+    )
+
+    print(f"✅ Uploaded to s3://{bucket}/{key}")
+
+#---------------------
+# 3. Run everything
+#---------------------
 if __name__ == "__main__":
-    posts = fetch_posts("TemasekPoly", limit=30)
-    print(posts)
-    save_to_json(posts)
+    subreddit = "TemasekPoly"
+    posts = fetch_posts(subreddit, limit=30)
+    upload_to_s3(posts, subreddit)
