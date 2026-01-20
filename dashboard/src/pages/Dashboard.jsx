@@ -37,11 +37,15 @@ export default function Dashboard() {
   const [chartMode, setChartMode] = useState("bar"); 
 
 useEffect(() => {
-    // The '/api' prefix triggers the proxy rule we just wrote in vite.config.js
-    const API_URL = "/test/sentiment/all?limit=50"; 
+    // 1. URL for the Proxy
+    const API_URL = "/api/sentiment/all?limit=50"; 
     
-    // It should just be the raw code.
-    const API_KEY = "my-secret-token-123"; 
+    // 2. LOAD KEY FROM ENV
+    // This grabs the value you defined as VITE_API_KEY in the .env file
+    const API_KEY = import.meta.env.VITE_API_KEY;
+
+    // Safety Debug: Check if it loaded (Remove this line after it works)
+    console.log("🔑 Loaded Key Length:", API_KEY ? API_KEY.length : "MISSING");
 
     setLoading(true);
 
@@ -49,18 +53,14 @@ useEffect(() => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        // The header name is "x-api-key", the value is just the code
-        "x-api-key": API_KEY
+        "x-api-key": API_KEY // Passes the loaded key
       }
     })
     .then(res => {
-      // If we still get a 403/401, it means the Key is wrong
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       return res.json();
     })
     .then(apiData => {
-      // 3. Map the Data (Use console.log to see the real shape if this stays blank!)
-      // console.log("Raw Data:", apiData); // <--- Uncomment this if it stays blank
       
       const cleanRows = apiData.map(item => ({
         Subreddit: item.subreddit || item.Subreddit || "Unknown", 
