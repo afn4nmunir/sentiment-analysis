@@ -1,42 +1,102 @@
-#root {
-  max-width: 1280px;
+:root {
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --panel2: #f1f5f9;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --brand: #2563eb;
+  --brand2: #7c3aed;
+  --good: #10b981;
+  --bad: #ef4444;
+  --neu: #94a3b8;
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+.fy-dashboard {
+  display: grid;
+  grid-template-columns: 260px 1fr 360px;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  align-items: start;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* --- Navigation --- */
+.fy-left { position: sticky; top: 24px; }
+.fy-nav-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: var(--muted);
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.fy-nav-item:hover { background: var(--panel2); }
+.fy-nav-item.active { background: var(--brand); color: white; }
+.count-badge { font-size: 10px; background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 10px; }
+
+/* --- Cards --- */
+.fy-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.sentiment-indicator {
+  width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* --- Chart Toggle UI --- */
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.toggle-group {
+  display: flex;
+  background: var(--panel2);
+  padding: 4px;
+  border-radius: 8px;
+}
+.toggle-btn {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+}
+.toggle-btn.active {
+  background: var(--panel);
+  color: var(--brand);
+  box-shadow: var(--shadow);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* --- Right Side (Sticky) --- */
+.fy-right {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
 }
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.fy-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
 }
