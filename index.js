@@ -1,18 +1,65 @@
-var express = require("express");
-var bodyParser = require("body-parser");
-var app = express();
+import cors from "cors";
+import express from "express";
+import bodyParser from "body-parser";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const app = express();
 const PORT = process.env.PORT || 5050;
-var startPage = "index.html";
+const startPage = "index.html";
+
+/* ================================
+   FIX __dirname for ES modules
+   ================================ */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/* ================================
+   MIDDLEWARE
+   ================================ */
+app.use(cors({
+    origin: "http://localhost:5173"
+}));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static("./public"));
+
+/* ================================
+   TEMP USER
+   ================================ */
+const USER = {
+    email: "test@example.com",
+    password: "123456"
+};
+
+/* ================================
+   LOGIN ROUTE
+   ================================ */
+app.post("/login", (req, res) => {
+    console.log("LOGIN HIT", req.body);
+
+    const { email, password } = req.body;
+
+    if (email === USER.email && password === USER.password) {
+        res.json({ success: true });
+    } else {
+        res.status(401).json({ success: false });
+    }
+});
+
+/* ================================
+   HOME PAGE
+   ================================ */
 app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/public/" + startPage);
+    res.sendFile(path.join(__dirname, "public", startPage));
 });
-server = app.listen(PORT, function () {
-    const address = server.address();
-    const baseUrl = `http://${address.address == "::" ? "localhost" :
-        address.address}:${address.port}`;
-    console.log(`Demo project at: ${baseUrl}`);
+
+/* ================================
+   START SERVER
+   ================================ */
+const server = app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
 });
-module.exports = { app, server };
+
+export { app, server };
