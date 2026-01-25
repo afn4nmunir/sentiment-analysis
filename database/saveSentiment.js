@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 
 const API_URL = `${process.env.AWS_SENTIMENT_URL}?limit=50`;
 const API_TOKEN = process.env.API_TOKEN;
-const DB_FILE = 'database/sentiment_db.json';
+const DB_FILE = 'sentiment_db.json';
 
 async function saveToJsonDB() {
     try {
