@@ -9,16 +9,16 @@ export async function loadResultsCsv() {
     const rawLines = text.match(/(".*?"|[^"\n]+)+/g);
     if (!rawLines || rawLines.length < 2) return [];
 
-    const headers = rawLines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const headers = rawLines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
 
     const results = rawLines.slice(1).map(line => {
       const regex = /(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)/g;
       const values = [];
       let match;
       while (match = regex.exec(line)) {
-        let val = match[1] || '';
-        if (val.startsWith('"') && val.endsWith('"')) {
-            val = val.slice(1, -1).replace(/""/g, '"');
+        let val = match[1] || "";
+        if (val.startsWith("\"") && val.endsWith("\"")) {
+            val = val.slice(1, -1).replace(/""/g, "\"");
         }
         values.push(val);
       }
