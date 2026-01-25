@@ -1,216 +1,280 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { loadResultsCsv } from "../utils/loadcsv";
+import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { MiniBarChart, MiniPieChart, Pill, SentimentPill } from "../components/Charts";
-import Topbar from "../components/Topbar";
-
-// --- Helpers
-const cleanSentiment = (val) => {
-  if (!val) return 0;
-  // Remove quotes and convert to float
-  return parseFloat(String(val).replace(/['"]/g, ""));
-};
-
-const extractContent = (combinedText) => {
-  if (!combinedText) return { title: "Untitled", body: "" };
-  // Split by literal "\n" sequence because that's how it is in the CSV
-  const parts = combinedText.split(/\\n|\n/); 
-  const title = parts[0].replace(/^"|"$/g, '').trim(); 
-  const body = parts.slice(1).join(" ").replace(/^"|"$/g, '').trim();
-  return { title: title || "Untitled Post", body };
-};
-
-const getGroupedData = (rows, key) => {
-  const counts = {};
-  rows.forEach(r => {
-    const val = r[key] || "Unknown";
-    counts[val] = (counts[val] || 0) + 1;
-  });
-  return Object.entries(counts)
-    .map(([label, value]) => ({ label, value }))
-    .sort((a, b) => b.value - a.value);
-};
 
 export default function Dashboard() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeSub, setActiveSub] = useState("All");
-  const [chartMode, setChartMode] = useState("bar"); 
+  const [error, setError] = useState(null);
+  
+  const [topicChartType, setTopicChartType] = useState('bar'); // 'bar' or 'pie'
+  const [emotionChartType, setEmotionChartType] = useState('bar'); // Controls the second chart
+  const [selectedSource, setSelectedSource] = useState('All');     // Controls the filter
 
-useEffect(() => {
-    // 1. URL for the Proxy
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  useEffect(() => {
     const API_URL = "/api/sentiment/all?limit=50"; 
-    
-    // 2. LOAD KEY FROM ENV
-    // This grabs the value you defined as VITE_API_KEY in the .env file
     const API_KEY = import.meta.env.VITE_API_KEY;
-
-    // Safety Debug: Check if it loaded (Remove this line after it works)
-    console.log("🔑 Loaded Key Length:", API_KEY ? API_KEY.length : "MISSING");
-
-    setLoading(true);
 
     fetch(API_URL, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": API_KEY // Passes the loaded key
-      }
+      headers: { "Content-Type": "application/json", "x-api-token": API_KEY }
     })
     .then(res => {
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       return res.json();
     })
     .then(apiData => {
-      
-      const cleanRows = apiData.map(item => ({
-        Subreddit: item.subreddit || item.Subreddit || "Unknown", 
-        Category: item.category || item.Category || "General",
-        CombinedText: item.text || item.body || item.CombinedText || "", 
-        Sentiment: parseFloat(item.sentiment || item.Sentiment || 0),
-        Emotion: item.emotion || item.Emotion || "neutral",
-        ProcessedAt: item.created_at ? new Date(item.created_at) : new Date(),
-        Title: item.title || item.Title || "Untitled Post",
-        Body: item.text || item.body || ""
-      }));
+      let rawList = [];
+      if (apiData.items && Array.isArray(apiData.items)) rawList = apiData.items;
+      else if (Array.isArray(apiData)) rawList = apiData; 
 
+      const cleanRows = rawList.map((item, index) => {
+        const safeText = String(item.CombinedText || item.text || item.body || "");
+        const safeDate = item.ProcessedAt ? new Date(item.ProcessedAt * 1000) : new Date();
+        return {
+          id: index,
+          Subreddit: item.Subreddit || item.subreddit || "Unknown", 
+          Category: item.Category || item.category || "Other",
+          Body: safeText,
+          Sentiment: parseFloat(item.Sentiment || item.sentiment || 0),
+          Emotion: item.Emotion || item.emotion || "neutral",
+          Date: safeDate.toLocaleDateString(),
+          Title: item.Title || `Post #${index + 1}`
+        };
+      });
       setRows(cleanRows);
       setLoading(false);
     })
     .catch(err => {
-      console.error("❌ API Fetch Failed:", err);
+      console.error(err);
+      setError(err.message);
       setLoading(false);
     });
   }, []);
 
-  const filtered = useMemo(() => {
-    return activeSub === "All" ? rows : rows.filter(r => r.Subreddit === activeSub);
-  }, [rows, activeSub]);
+const toggleStyle = (current, type) => ({
+    padding: '4px 8px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold',
+    background: current === type ? 'white' : 'transparent',
+    color: current === type ? 'var(--brand)' : '#64748b',
+    boxShadow: current === type ? '0 1px 2px rgba(0,0,0,0.1)' : 'none'
+  });
 
-  // Derived Analytics
-  const subreddits = useMemo(() => {
-    const list = getGroupedData(rows, "Subreddit");
-    return [{ label: "All", value: rows.length }, ...list];
-  }, [rows]);
+const stats = useMemo(() => {
+    // 1. Calculate Source Counts (Use ALL rows for this, so badges don't disappear)
+    const sourceCounts = {};
+    rows.forEach(r => {
+      const src = r.Subreddit;
+      sourceCounts[src] = (sourceCounts[src] || 0) + 1;
+    });
+    // Sort sources by popularity (highest count first)
+    const uniqueSources = Object.keys(sourceCounts).sort((a,b) => sourceCounts[b] - sourceCounts[a]);
 
-  const categoryStats = useMemo(() => getGroupedData(filtered, "Category"), [filtered]);
-  const emotionStats = useMemo(() => getGroupedData(filtered, "Emotion"), [filtered]);
+    // 2. Filter Rows (This decides what shows in the Feed & Charts)
+    const visibleRows = selectedSource === 'All' 
+      ? rows 
+      : rows.filter(r => r.Subreddit === selectedSource);
 
-  const sentimentSummary = useMemo(() => {
-    const pos = filtered.filter(r => r.Sentiment > 0).length;
-    const neg = filtered.filter(r => r.Sentiment < 0).length;
-    return { pos, neg, neu: filtered.length - pos - neg };
-  }, [filtered]);
+    // 3. Calculate Charts (Using only VISIBLE rows)
+    const topicMap = {};
+    const emotionMap = {};
+    let posCount = 0;
+    let negCount = 0;
 
-  if (loading) return <div style={{ padding: 60, textAlign: 'center' }}>Loading Project Data...</div>;
+    visibleRows.forEach(row => {
+      // Count Topics
+      const cat = row.Category || "Other";
+      topicMap[cat] = (topicMap[cat] || 0) + 1;
+
+      // Count Emotions
+      const emo = row.Emotion || "Neutral";
+      emotionMap[emo] = (emotionMap[emo] || 0) + 1;
+
+      // Count Volume
+      if (row.Sentiment > 0) posCount++;
+      else if (row.Sentiment < 0) negCount++;
+    });
+
+    // Format Data for Charts
+    const topics = Object.keys(topicMap)
+      .map(key => ({ name: key, label: key, value: topicMap[key] }))
+      .sort((a,b) => b.value - a.value).slice(0, 5);
+
+    const emotions = Object.keys(emotionMap)
+      .map(key => ({ name: key, label: key, value: emotionMap[key] }))
+      .sort((a,b) => b.value - a.value).slice(0, 5);
+    
+    const total = posCount + negCount || 1;
+    const volPos = Math.round((posCount / total) * 100);
+    const volNeg = Math.round((negCount / total) * 100);
+
+    return { 
+      topics, emotions, volPos, volNeg, posCount, negCount, 
+      uniqueSources, sourceCounts, visibleRows 
+    };
+  }, [rows, selectedSource]);
 
   return (
-    <div className="dashboard-shell">
-      <Topbar title={`Workspace: ${activeSub}`} />
+    <div className="fy-dashboard">
+      
+      <aside className="fy-left">
+            <h3 style={{color: 'var(--brand)', marginTop: 0}}>Feelytics</h3>
+        <div style={{fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted)', marginTop: '20px', marginBottom: '10px'}}>
+            DATA SOURCES ({stats.uniqueSources.length})
+        </div>
+        
+        {/* 1. "All" Button */}
+        <button 
+          className={`fy-nav-item ${selectedSource === 'All' ? 'active' : ''}`}
+          onClick={() => setSelectedSource('All')}
+        >
+          <span>All Sources</span>
+          <span className="count-badge">{rows.length}</span>
+        </button>
 
-      <main className="fy-dashboard">
-        {/* LEFT: ENTITIES */}
-        <aside className="fy-left">
-          <div style={{ fontWeight: 800, fontSize: 12, color: 'var(--muted)', marginBottom: 16, textTransform: 'uppercase' }}>
-            Data Sources
-          </div>
-          {subreddits.map(s => (
-            <div 
-              key={s.label} 
-              className={`fy-nav-item ${activeSub === s.label ? 'active' : ''}`}
-              onClick={() => setActiveSub(s.label)}
-            >
-              <span>{s.label}</span>
-              <span className="count-badge">{s.value}</span>
+        {/* 2. Dynamic Source List */}
+        <div className="source-list">
+            {stats.uniqueSources.map((source) => (
+                <button 
+                  key={source} 
+                  className={`fy-nav-item ${selectedSource === source ? 'active' : ''}`}
+                  onClick={() => setSelectedSource(source)}
+                >
+                    <span>{source}</span>
+                    <span className="count-badge">{stats.sourceCounts[source]}</span>
+                </button>
+            ))}
+        </div>
+        
+        <div className="admin-section">
+            <div style={{fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted)', marginBottom: '10px'}}>ADMIN</div>
+            <button onClick={handleLogout} className="fy-nav-item" style={{justifyContent: 'flex-start', color: 'var(--bad)'}}>
+            Sign Out
+            </button>
+        </div>
+      </aside>
+
+      <main>
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
+          <h2 style={{margin: 0}}>Active Intelligence</h2>
+          <span style={{color: 'var(--muted)'}}>Showing {rows.length} insights</span>
+        </div>
+
+        {loading && <p>Loading intelligence...</p>}
+        {error && <p style={{color: 'red'}}>Error: {error}</p>}
+
+        {stats.visibleRows.map((row) => (
+          <div key={row.id} className="fy-card">
+            <div className="post-meta">
+              <span className="post-source" style={{ 
+                color: row.Sentiment > 0 ? 'var(--good)' : (row.Sentiment < 0 ? 'var(--bad)' : 'var(--muted)') 
+              }}>
+                ● <span style={{color: 'var(--muted)', marginLeft: '4px'}}>{row.Subreddit}</span>
+              </span>
+              <span>{row.Date}</span>
             </div>
-          ))}
-        </aside>
-
-        {/* CENTER: FEED */}
-        <section className="fy-feed">
-          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
-            <h3 style={{ margin: 0 }}>Active Intelligence</h3>
-            <span style={{ color: 'var(--muted)', fontSize: 13 }}>Showing {filtered.length} insights</span>
-          </div>
-
-          {filtered.map((r, i) => (
-            <div key={i} className="fy-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                   {/* Sentiment Indicator Dot */}
-                  <div style={{ 
-                    width: 10, height: 10, borderRadius: '50%', 
-                    background: r.Sentiment > 0 ? 'var(--good)' : r.Sentiment < 0 ? 'var(--bad)' : 'var(--neu)' 
-                  }} />
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>
-                    {r.Subreddit}
-                  </span>
-                </div>
-                <span style={{ fontSize: 12, color: 'var(--muted)' }}>
-                  {r.ProcessedAt.toLocaleDateString()}
-                </span>
-              </div>
-
-              {/* THE TITLE IS NOW HERE */}
-              <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: 'var(--text)' }}>
-                {r.Title}
-              </div>
-              
-              <div style={{ fontSize: 14, lineHeight: 1.5, color: '#475569', marginBottom: 16 }}>
-                {r.Body.substring(0, 200)}...
-              </div>
-
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', borderTop: '1px solid var(--border)', paddingTop: 12 }}>
-                <Pill label={r.Category} type="brand" />
-                <SentimentPill score={r.Sentiment} />
-                <Pill label={r.Emotion} type="neu" />
-              </div>
-            </div>
-          ))}
-        </section>
-
-        {/* RIGHT: ANALYTICS */}
-        <aside className="fy-right">
-          <div className="fy-panel">
-            <div className="chart-header">
-              <span style={{ fontWeight: 700 }}>Topic Distribution</span>
-              <div className="toggle-group">
-                <button className={`toggle-btn ${chartMode === 'bar' ? 'active' : ''}`} onClick={() => setChartMode('bar')}>Bar</button>
-                <button className={`toggle-btn ${chartMode === 'pie' ? 'active' : ''}`} onClick={() => setChartMode('pie')}>Pie</button>
-              </div>
-            </div>
-            {chartMode === 'bar' ? (
-              <MiniBarChart data={categoryStats} color="var(--brand)" />
-            ) : (
-              <MiniPieChart data={categoryStats} />
-            )}
-          </div>
-
-          <div className="fy-panel">
-            <div className="chart-header">
-              <span style={{ fontWeight: 700 }}>Emotional Landscape</span>
-            </div>
-            {chartMode === 'bar' ? (
-              <MiniBarChart data={emotionStats} color="var(--brand2)" />
-            ) : (
-              <MiniPieChart data={emotionStats} />
-            )}
-          </div>
-
-          <div className="fy-panel" style={{ background: 'var(--text)', color: 'white' }}>
-            <span style={{ fontWeight: 700, display: 'block', marginBottom: 16 }}>Sentiment Volume</span>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.1)' }}>
-                <div style={{ fontSize: 10, opacity: 0.7 }}>POSITIVE</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--good)' }}>{sentimentSummary.pos}</div>
-              </div>
-              <div style={{ padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.1)' }}>
-                <div style={{ fontSize: 10, opacity: 0.7 }}>NEGATIVE</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--bad)' }}>{sentimentSummary.neg}</div>
-              </div>
+            <div className="post-title">{row.Title}</div>
+            <div className="post-body">{row.Body.substring(0, 200)}...</div>
+            
+            <div className="tag-container">
+              <Pill label={row.Category} color="blue" />
+              <SentimentPill score={row.Sentiment} />
+              <Pill label={row.Emotion} color="gray" />
             </div>
           </div>
-        </aside>
+        ))}
       </main>
+
+      <aside className="fy-right">
+        
+        <div className="fy-panel">
+          <div className="chart-header">
+            <span>Topic Distribution</span>
+              <div className="toggle-group" style={{background: '#f1f5f9', padding: '2px', borderRadius: '6px', display: 'flex'}}>
+                <button 
+                    onClick={() => setTopicChartType('bar')}
+                    style={toggleStyle(topicChartType, 'bar')}
+                >
+                    Bar
+                </button>
+                <button 
+                    onClick={() => setTopicChartType('pie')}
+                    style={toggleStyle(topicChartType, 'pie')}
+                >
+                    Pie
+                </button>
+            </div>
+          </div>
+          
+          <div style={{height: '180px', width: '100%'}}>
+             {topicChartType === 'bar' ? (
+                 <MiniBarChart data={stats.topics} />
+             ) : (
+                 <MiniPieChart data={stats.topics} />
+             )}
+          </div>
+        </div>
+
+        <div className="fy-panel">
+           <div className="chart-header">
+            <span>Emotional Landscape</span>
+            
+            <div className="toggle-group" style={{background: '#f1f5f9', padding: '2px', borderRadius: '6px', display: 'flex'}}>
+                <button 
+                  onClick={() => setEmotionChartType('bar')} 
+                  style={toggleStyle(emotionChartType, 'bar')}
+                >Bar</button>
+                <button 
+                  onClick={() => setEmotionChartType('pie')} 
+                  style={toggleStyle(emotionChartType, 'pie')}
+                >Pie</button>
+            </div>
+          </div>
+
+           <div style={{height: '180px', width: '100%'}}>
+             {emotionChartType === 'bar' 
+               ? <MiniBarChart data={stats.emotions} /> 
+               : <MiniPieChart data={stats.emotions} />
+             }
+           </div>
+        </div>
+
+        <div className="fy-panel" style={{background: '#1e293b', color: 'white'}}>
+          <div style={{fontWeight: 'bold', marginBottom: '10px'}}>Sentiment Volume</div>
+          <div style={{display: 'flex', gap: '10px', marginTop: '10px'}}>
+             
+             <div style={{flex: 1, background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '8px'}}>
+                <span style={{fontSize: '1.8rem', fontWeight: 800, color: '#34d399', display: 'block', lineHeight: 1}}>
+                  {stats.posCount}
+                </span>
+                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '5px'}}>
+                    <span style={{fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.7}}>Positive</span>
+                    <span style={{fontSize: '0.8rem', fontWeight: 'bold', color: '#34d399'}}>{stats.volPos}%</span>
+                </div>
+             </div>
+
+             <div style={{flex: 1, background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '8px'}}>
+                <span style={{fontSize: '1.8rem', fontWeight: 800, color: '#f87171', display: 'block', lineHeight: 1}}>
+                  {stats.negCount}
+                </span>
+                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '5px'}}>
+                    <span style={{fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.7}}>Negative</span>
+                    <span style={{fontSize: '0.8rem', fontWeight: 'bold', color: '#f87171'}}>{stats.volNeg}%</span>
+                </div>
+             </div>
+
+          </div>
+        </div>
+      </aside>
+
     </div>
   );
 }
