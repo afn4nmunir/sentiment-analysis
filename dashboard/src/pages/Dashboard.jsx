@@ -39,16 +39,22 @@ export default function Dashboard() {
 
       const cleanRows = rawList.map((item, index) => {
         const safeText = String(item.CombinedText || item.text || item.body || "");
+        const [titlePart, bodyPart] = safeText.split("\n\n", 2);
+        const title = titlePart?.trim() || item.Title || `Post #${index + 1}`;
+        const body = bodyPart?.trim() || safeText;
+        const postId = item.sourcePostId;
+        const redditUrl = postId ? `https://www.reddit.com/comments/${postId}/` : null;
         const safeDate = item.ProcessedAt ? new Date(item.ProcessedAt * 1000) : new Date();
         return {
           id: index,
+          redditUrl,
           Subreddit: item.Subreddit || item.subreddit || "Unknown", 
           Category: item.Category || item.category || "Other",
-          Body: safeText,
+          Body: body,
           Sentiment: parseFloat(item.Sentiment || item.sentiment || 0),
           Emotion: item.Emotion || item.emotion || "neutral",
           Date: safeDate.toLocaleDateString(),
-          Title: item.Title || `Post #${index + 1}`
+          Title: title
         };
       });
       setRows(cleanRows);
