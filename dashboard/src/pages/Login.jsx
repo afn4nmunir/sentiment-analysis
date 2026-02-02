@@ -25,7 +25,7 @@ export default function Login() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-header">
-          <h1 className="brand-logo">Feelytics</h1>
+          <h1 className="brand-logo">InSight</h1>
           <h2>Sign in to Portal</h2>
         </div>
 

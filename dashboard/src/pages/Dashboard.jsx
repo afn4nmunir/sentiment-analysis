@@ -132,7 +132,7 @@ const stats = useMemo(() => {
     <div className="fy-dashboard">
       
       <aside className="fy-left">
-            <h3 style={{color: 'var(--brand)', marginTop: 0}}>Feelytics</h3>
+            <h3 style={{color: 'var(--brand)', marginTop: 0}}>InSight</h3>
         <div style={{fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted)', marginTop: '20px', marginBottom: '10px'}}>
             DATA SOURCES ({stats.uniqueSources.length})
         </div>
