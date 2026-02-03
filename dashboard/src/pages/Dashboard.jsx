@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { MiniBarChart, MiniPieChart, Pill, SentimentPill } from "../components/Charts";
+import PostModal from '../components/PostModal';
 
 export default function Dashboard() {
   const [rows, setRows] = useState([]);
@@ -11,6 +12,8 @@ export default function Dashboard() {
   const [topicChartType, setTopicChartType] = useState('bar'); // 'bar' or 'pie'
   const [emotionChartType, setEmotionChartType] = useState('bar'); // Controls the second chart
   const [selectedSource, setSelectedSource] = useState('All');     // Controls the filter
+
+  const [selectedPost, setSelectedPost] = useState(null);
 
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -178,7 +181,7 @@ const stats = useMemo(() => {
         {error && <p style={{color: 'red'}}>Error: {error}</p>}
 
         {stats.visibleRows.map((row) => (
-          <div key={row.id} className="fy-card">
+          <div key={row.id} className="fy-card" onClick={() => setSelectedPost(row)} style={{ cursor: 'pointer', transition: 'transform 0.1s' }}>
             <div className="post-meta">
               <span className="post-source" style={{ 
                 color: row.Sentiment > 0 ? 'var(--good)' : (row.Sentiment < 0 ? 'var(--bad)' : 'var(--muted)') 
@@ -280,7 +283,7 @@ const stats = useMemo(() => {
           </div>
         </div>
       </aside>
-
+    <PostModal post={selectedPost} onClose={() => setSelectedPost(null)}/>
     </div>
   );
 }
