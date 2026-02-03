@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { MiniBarChart, MiniPieChart, Pill, SentimentPill } from "../components/Charts";
+import { MiniBarChart, MiniPieChart, Pill, SentimentPill, MiniTrendChart } from "../components/Charts";
 import PostModal from '../components/PostModal';
 
 export default function Dashboard() {
@@ -125,9 +125,34 @@ export default function Dashboard() {
     const volPos = Math.round((posCount / total) * 100);
     const volNeg = Math.round((negCount / total) * 100);
 
+    const timeMap = {}; 
+    visibleRows.forEach(row => {
+      const dateObj = new Date(row.Date);
+      if (!isNaN(dateObj)) {
+        const dateKey = `${dateObj.getMonth() + 1}/${dateObj.getDate()}`; // "1/25"
+        
+        if (!timeMap[dateKey]) {
+           timeMap[dateKey] = { date: dateKey, positive: 0, negative: 0, stress: 0, happy: 0, confusion: 0 };
+        }
+
+        // Increment Sentiment
+        if (row.Sentiment > 0) timeMap[dateKey].positive++;
+        else if (row.Sentiment < 0) timeMap[dateKey].negative++;
+
+        // Increment Emotion (Normalize text)
+        const emo = (row.Emotion || "").toLowerCase();
+        if (timeMap[dateKey][emo] !== undefined) timeMap[dateKey][emo]++;
+        else timeMap[dateKey][emo] = 1;
+      }
+    });
+
+    const trendData = Object.values(timeMap).sort((a, b) => 
+       new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
     return {
       topics, emotions, volPos, volNeg, posCount, negCount,
-      uniqueSources, sourceCounts, visibleRows
+      uniqueSources, sourceCounts, visibleRows, trendData
     };
   }, [rows, selectedSource]);
 
@@ -237,28 +262,41 @@ export default function Dashboard() {
           </div>
         </div>
 
+{/* Chart 2: Emotional Landscape */}
         <div className="fy-panel">
-          <div className="chart-header">
+           <div className="chart-header">
             <span>Emotional Landscape</span>
-
-            <div className="toggle-group" style={{ background: '#f1f5f9', padding: '2px', borderRadius: '6px', display: 'flex' }}>
-              <button
-                onClick={() => setEmotionChartType('bar')}
-                style={toggleStyle(emotionChartType, 'bar')}
-              >Bar</button>
-              <button
-                onClick={() => setEmotionChartType('pie')}
-                style={toggleStyle(emotionChartType, 'pie')}
-              >Pie</button>
+            
+            {/* 👇 3-WAY TOGGLE GROUP */}
+            <div className="toggle-group" style={{background: '#f1f5f9', padding: '2px', borderRadius: '6px', display: 'flex'}}>
+                <button 
+                  onClick={() => setEmotionChartType('bar')} 
+                  style={toggleStyle(emotionChartType, 'bar')}
+                >Bar</button>
+                <button 
+                  onClick={() => setEmotionChartType('pie')} 
+                  style={toggleStyle(emotionChartType, 'pie')}
+                >Pie</button>
+                <button 
+                  onClick={() => setEmotionChartType('trend')} 
+                  style={toggleStyle(emotionChartType, 'trend')}
+                >Trend</button>
             </div>
           </div>
 
-          <div style={{ height: '180px', width: '100%' }}>
-            {emotionChartType === 'bar'
-              ? <MiniBarChart data={stats.emotions} />
-              : <MiniPieChart data={stats.emotions} />
-            }
-          </div>
+           <div style={{minHeight: '180px', width: '100%'}}>
+             {emotionChartType === 'bar' && <MiniBarChart data={stats.emotions} color="#7c3aed" />}
+             {emotionChartType === 'pie' && <MiniPieChart data={stats.emotions} />}
+             
+             {/* 👇 THE NEW TREND CHART */}
+             {emotionChartType === 'trend' && (
+                <MiniTrendChart 
+                  data={stats.trendData} 
+                  // We extract the top 3 emotion names from your stats to determine which lines to draw
+                  keys={stats.emotions.slice(0, 3).map(e => e.name)} 
+                />
+             )}
+           </div>
         </div>
 
         <div className="fy-panel" style={{ background: '#1e293b', color: 'white' }}>
