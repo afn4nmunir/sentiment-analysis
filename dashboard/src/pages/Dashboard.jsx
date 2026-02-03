@@ -5,6 +5,8 @@ import { MiniBarChart, MiniPieChart, Pill, SentimentPill, MiniTrendChart } from 
 import PostModal from '../components/PostModal';
 
 export default function Dashboard() {
+  const PREVIEW_LENGTH = 200;
+
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -213,7 +215,7 @@ export default function Dashboard() {
               }}>
                 ● <span style={{ color: 'var(--muted)', marginLeft: '4px' }}>{row.Subreddit}</span>
               </span>
-              <span>{row.Date}</span>
+              <span>Crawled on {row.Date}</span>
             </div>
             <div className="post-title">{row.Title}</div>
             <div className="post-link">
@@ -221,7 +223,9 @@ export default function Dashboard() {
                 <a href={row.redditUrl} target="_blank" rel="noopener noreferrer">View on Reddit</a>
               )}
             </div>
-            <div className="post-body">{row.Body.substring(0, 200)}...</div>
+            <div className="post-body">{row.Body.length > PREVIEW_LENGTH
+              ? `${row.Body.slice(0, PREVIEW_LENGTH)}...`
+              : row.Body}</div>
 
             <div className="tag-container">
               <Pill label={row.Category} color="blue" />
