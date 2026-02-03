@@ -49,6 +49,11 @@ export default function PostModal({ post, onClose }) {
            <h2 style={{marginTop: 0, marginBottom: '20px', color: '#1e293b', fontSize: '1.5rem'}}>
              {post.Title}
            </h2>
+           <div style={{marginTop: 0, marginBottom: '20px', color: '#1e293b', fontSize: '1rem'}}>
+             {post.redditUrl && (
+                <a href={post.redditUrl} target="_blank" rel="noopener noreferrer">View on Reddit</a>
+              )}
+           </div>
            
            <div style={{
              fontSize: '1rem', lineHeight: '1.7', color: '#334155', 
