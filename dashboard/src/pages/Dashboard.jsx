@@ -292,12 +292,10 @@ export default function Dashboard() {
              {emotionChartType === 'bar' && <MiniBarChart data={stats.emotions} color="#7c3aed" />}
              {emotionChartType === 'pie' && <MiniPieChart data={stats.emotions} />}
              
-             {/* 👇 THE NEW TREND CHART */}
              {emotionChartType === 'trend' && (
                 <MiniTrendChart 
                   data={stats.trendData} 
-                  // We extract the top 3 emotion names from your stats to determine which lines to draw
-                  keys={stats.emotions.slice(0, 3).map(e => e.name)} 
+                  keys={stats.emotions.slice(0, 5).map(e => e.name)} 
                 />
              )}
            </div>

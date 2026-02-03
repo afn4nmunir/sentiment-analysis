@@ -97,7 +97,7 @@ export function MiniPieChart({ data }) {
     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
       {/* The Pie SVG */}
       <svg width="100" height="100" viewBox="-1 -1 2 2" style={{ transform: "rotate(-90deg)" }}>
-        {data.slice(0, 6).map((slice, i) => {
+        {data.slice(0, 5).map((slice, i) => {
           const sliceAngle = (slice.value / total) * 2 * Math.PI;
           const x1 = Math.cos(accumulatedAngle);
           const y1 = Math.sin(accumulatedAngle);
@@ -121,7 +121,7 @@ export function MiniPieChart({ data }) {
 
       {/* The Legend */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {data.slice(0, 4).map((d, i) => (
+        {data.slice(0, 5).map((d, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: 11, color: '#475569' }}>
             <span style={{ width: 8, height: 8, borderRadius: 2, background: palette[i % palette.length], marginRight: 6 }} />
             <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.label}</span>
