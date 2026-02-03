@@ -42,7 +42,7 @@ export default function Dashboard() {
         const [titlePart, bodyPart] = safeText.split("\n\n", 2);
         const title = titlePart?.trim() || item.Title || `Post #${index + 1}`;
         const body = bodyPart?.trim() || safeText;
-        const postId = item.sourcePostId;
+        const postId = item.SourcePostId;
         const redditUrl = postId ? `https://www.reddit.com/comments/${postId}/` : null;
         const safeDate = item.ProcessedAt ? new Date(item.ProcessedAt * 1000) : new Date();
         return {
@@ -188,6 +188,11 @@ const stats = useMemo(() => {
               <span>{row.Date}</span>
             </div>
             <div className="post-title">{row.Title}</div>
+            <div className="post-link">
+              {row.redditUrl && (
+                <a href={row.redditUrl} target="_blank" rel="noopener noreferrer">View on Reddit</a>
+              )}
+            </div>
             <div className="post-body">{row.Body.substring(0, 200)}...</div>
             
             <div className="tag-container">
