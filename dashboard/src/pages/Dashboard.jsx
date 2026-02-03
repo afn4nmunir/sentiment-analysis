@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { MiniBarChart, MiniPieChart, Pill, SentimentPill } from "../components/Charts";
+import { MiniBarChart, MiniPieChart, Pill, SentimentPill, MiniTrendChart } from "../components/Charts";
 import PostModal from '../components/PostModal';
 
 export default function Dashboard() {
@@ -24,7 +24,7 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    const API_URL = "/api/sentiment/all?limit=50"; 
+    const API_URL = "/api/sentiment/all?limit=100"; 
     const API_KEY = import.meta.env.VITE_API_KEY;
 
     fetch(API_URL, {
@@ -125,9 +125,35 @@ const stats = useMemo(() => {
     const volPos = Math.round((posCount / total) * 100);
     const volNeg = Math.round((negCount / total) * 100);
 
+    // 👇 TIME SERIES LOGIC (Calculates the data for the TrendChart)
+    const timeMap = {}; 
+    visibleRows.forEach(row => {
+      const dateObj = new Date(row.Date);
+      if (!isNaN(dateObj)) {
+        const dateKey = `${dateObj.getMonth() + 1}/${dateObj.getDate()}`; // "1/25"
+        
+        if (!timeMap[dateKey]) {
+           timeMap[dateKey] = { date: dateKey, positive: 0, negative: 0, stress: 0, happy: 0, confusion: 0 };
+        }
+
+        // Increment Sentiment
+        if (row.Sentiment > 0) timeMap[dateKey].positive++;
+        else if (row.Sentiment < 0) timeMap[dateKey].negative++;
+
+        // Increment Emotion (Normalize text)
+        const emo = (row.Emotion || "").toLowerCase();
+        if (timeMap[dateKey][emo] !== undefined) timeMap[dateKey][emo]++;
+        else timeMap[dateKey][emo] = 1;
+      }
+    });
+
+    const trendData = Object.values(timeMap).sort((a, b) => 
+       new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
     return { 
       topics, emotions, volPos, volNeg, posCount, negCount, 
-      uniqueSources, sourceCounts, visibleRows 
+      uniqueSources, sourceCounts, visibleRows, trendData
     };
   }, [rows, selectedSource]);
 
@@ -181,7 +207,7 @@ const stats = useMemo(() => {
         {error && <p style={{color: 'red'}}>Error: {error}</p>}
 
         {stats.visibleRows.map((row) => (
-          <div key={row.id} className="fy-card" onClick={() => setSelectedPost(row)} style={{ cursor: 'pointer', transition: 'transform 0.1s' }}>
+          <div key={row.id} className="fy-card" onClick={() => setSelectedPost(row)} style={{ cursor: 'pointer', transition: 'transform 0.1s'}}>
             <div className="post-meta">
               <span className="post-source" style={{ 
                 color: row.Sentiment > 0 ? 'var(--good)' : (row.Sentiment < 0 ? 'var(--bad)' : 'var(--muted)') 
@@ -250,14 +276,23 @@ const stats = useMemo(() => {
                   onClick={() => setEmotionChartType('pie')} 
                   style={toggleStyle(emotionChartType, 'pie')}
                 >Pie</button>
+                <button 
+                  onClick={() => setEmotionChartType('trend')} 
+                  style={toggleStyle(emotionChartType, 'trend')}
+                >Trend</button>
             </div>
           </div>
 
-           <div style={{height: '180px', width: '100%'}}>
-             {emotionChartType === 'bar' 
-               ? <MiniBarChart data={stats.emotions} /> 
-               : <MiniPieChart data={stats.emotions} />
-             }
+           <div style={{minHeight: '180px', width: '100%'}}>
+             {emotionChartType === 'bar' && <MiniBarChart data={stats.emotions} color="#7c3aed" />}
+             {emotionChartType === 'pie' && <MiniPieChart data={stats.emotions} />}
+             
+             {emotionChartType === 'trend' && (
+                <MiniTrendChart 
+                  data={stats.trendData} 
+                  keys={stats.emotions.slice(0, 3).map(e => e.name)} 
+                />
+             )}
            </div>
         </div>
 
