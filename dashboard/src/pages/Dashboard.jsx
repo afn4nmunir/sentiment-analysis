@@ -201,7 +201,7 @@ export default function Dashboard() {
       <main>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h2 style={{ margin: 0 }}>Active Intelligence</h2>
-          <span style={{ color: 'var(--muted)' }}>Showing {rows.length} insights</span>
+          <span style={{ color: 'var(--muted)' }}>Showing {stats.visibleRows.length} insights</span>
         </div>
 
         {loading && <p>Loading intelligence...</p>}
