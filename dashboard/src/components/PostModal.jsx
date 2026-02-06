@@ -5,7 +5,6 @@ export default function PostModal({ post, onClose }) {
   if (!post) return null;
 
   return (
-    // 1. THE DARK OVERLAY (Background)
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: 'rgba(0,0,0,0.6)',
@@ -14,7 +13,6 @@ export default function PostModal({ post, onClose }) {
       zIndex: 9999 
     }} onClick={onClose}>
       
-      {/* 2. THE WHITE CARD (Content) */}
       <div style={{
         backgroundColor: 'white', 
         width: '90%', maxWidth: '700px', 
@@ -26,7 +24,6 @@ export default function PostModal({ post, onClose }) {
         position: 'relative'
       }} onClick={e => e.stopPropagation()}> 
 
-        {/* HEADER */}
         <div style={{
           padding: '20px 25px', 
           borderBottom: '1px solid #e5e7eb',
@@ -44,7 +41,6 @@ export default function PostModal({ post, onClose }) {
            }}>×</button>
         </div>
 
-        {/* SCROLLABLE BODY */}
         <div style={{padding: '30px', overflowY: 'auto'}}>
            <h2 style={{marginTop: 0, marginBottom: '20px', color: '#1e293b', fontSize: '1.5rem'}}>
              {post.Title}
@@ -63,7 +59,6 @@ export default function PostModal({ post, onClose }) {
            </div>
         </div>
 
-        {/* FOOTER (Tags) */}
         <div style={{
           padding: '20px 25px', 
           borderTop: '1px solid #e5e7eb',

@@ -1,8 +1,7 @@
-// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import '../App.css'; // We will put the CSS here
+import '../App.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -25,7 +24,12 @@ export default function Login() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-header">
-          <h1 className="brand-logo">InSight</h1>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px', marginBottom: '30px' }}>
+            <img src="/InSight-Logo.png" alt="InSight Logo" style={{ width: '50px', height: '50px' }} />
+            <h1 style={{ color: 'var(--brand)', margin: 0, fontSize: '2.5rem', fontWeight: '800', letterSpacing: '-1px' }}>
+              InSight
+            </h1>
+          </div>
           <h2>Sign in to Portal</h2>
         </div>
 
@@ -37,7 +41,7 @@ export default function Login() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@feelytics.com"
+              placeholder="admin@insight.com"
               required
             />
           </div>

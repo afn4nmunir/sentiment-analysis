@@ -1,12 +1,10 @@
-// src/App.jsx
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import './App.css'; // Ensure global styles are loaded
+import './App.css';
 
-// 🛡️ The Guard: Bounces you back to login if you aren't signed in
 function PrivateRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" />;
@@ -28,7 +26,6 @@ export default function App() {
             } 
           />
 
-          {/* Default to Login */}
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
       </BrowserRouter>

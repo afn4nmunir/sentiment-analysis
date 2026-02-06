@@ -6,13 +6,13 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   // Check localStorage so we don't get logged out on refresh
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('feelytics_user');
+    const saved = localStorage.getItem('insight_user');
     return saved ? JSON.parse(saved) : null;
   });
 
   const login = (email, password) => {
     // 🎭 FAKE AUTH: Hardcoded credentials for the demo
-    if (email === "admin@feelytics.com" && password === "admin") {
+    if (email === "admin@insight.com" && password === "admin") {
       const fakeUser = { 
         name: "Admin User", 
         email: email, 
@@ -20,16 +20,16 @@ export function AuthProvider({ children }) {
         avatar: "https://ui-avatars.com/api/?name=Admin+User"
       };
       setUser(fakeUser);
-      localStorage.setItem('feelytics_user', JSON.stringify(fakeUser));
+      localStorage.setItem('insight_user', JSON.stringify(fakeUser));
       return { success: true };
     } 
     
-    return { success: false, message: "Invalid credentials (Try: admin@feelytics.com / admin)" };
+    return { success: false, message: "Invalid credentials (Try: admin@insight.com / admin)" };
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('feelytics_user');
+    localStorage.removeItem('insight_user');
   };
 
   return (
