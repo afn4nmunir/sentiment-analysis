@@ -32,6 +32,30 @@ export default function Dashboard() {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Handle scroll event to show/hide button
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show button if scrolled down more than 300px
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Function to scroll to top
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -362,6 +386,14 @@ export default function Dashboard() {
         </div>
         <div style={{ height: '80px' }}></div>
       </aside>
+
+      <button
+        className={`fab-scroll-top ${showScrollTop ? 'visible' : ''}`}
+        onClick={scrollToTop}
+        aria-label="Scroll to top"
+      >
+        ↑
+      </button>
 
       <div className="mobile-nav">
         <button
