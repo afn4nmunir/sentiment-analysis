@@ -340,3 +340,29 @@ body {
     margin-top: 20px;
   }
 }
+
+/* --- Add these styles for the Sticky Header --- */
+
+.feed-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--bg); /* Matches page background to hide scrolling items */
+  padding-top: 5px; /* Adds breathing room when stuck to top */
+  padding-bottom: 5px; /* Spacing between search bar and first card */
+}
+
+/* Mobile Adjustments */
+@media (max-width: 1024px) {
+  .feed-header {
+    position: sticky;
+    top: -20px; /* 👈 KEY FIX */
+    z-index: 100;
+
+    margin: -20px -20px 20px -20px;
+    padding: 20px 20px 10px 20px;
+
+    background-color: var(--bg);
+    border-bottom: 1px solid var(--border); /* Optional: adds a subtle separator on mobile */
+  }
+}

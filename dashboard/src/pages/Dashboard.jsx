@@ -227,49 +227,51 @@ export default function Dashboard() {
 
       {/* 2. CENTER MAIN (Feed) - Has class 'active-mobile' if active */}
       <main className={`${mobileView === 'feed' ? 'active-mobile' : ''}`}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 style={{ margin: 0 }}>Active Intelligence</h2>
-          <span style={{ color: 'var(--muted)' }}>{stats.visibleRows.length} insights</span>
-        </div>
+        <div className="feed-header">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <h2 style={{ margin: 0 }}>Active Intelligence</h2>
+            <span style={{ color: 'var(--muted)' }}>{stats.visibleRows.length} insights</span>
+          </div>
 
-        <div style={{ position: 'relative', width: '100%', marginBottom: '20px' }}>
-          <input
-            type="text"
-            placeholder="Search posts, keywords, or sources…"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              marginTop: '1px',
-              width: '100%',
-              padding: '10px 40px 10px 24px',
-              borderRadius: '10px',
-              border: '1px solid var(--border)',
-              fontSize: '0.9rem',
-              outline: 'none',
-              background: 'var(--panel)',
-            }}
-          />
-
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              title="Clear search"
+          <div style={{ position: 'relative', width: '100%', marginBottom: '20px' }}>
+            <input
+              type="text"
+              placeholder="Search posts, keywords, or sources…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               style={{
-                position: 'absolute',
-                right: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                fontSize: '1rem',
-                color: 'var(--muted)',
-                padding: 0,
+                marginTop: '1px',
+                width: '100%',
+                padding: '10px 40px 10px 24px',
+                borderRadius: '10px',
+                border: '1px solid var(--border)',
+                fontSize: '0.9rem',
+                outline: 'none',
+                background: 'var(--panel)',
               }}
-            >
-              🔄
-            </button>
-          )}
+            />
+
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                title="Clear search"
+                style={{
+                  position: 'absolute',
+                  right: '14px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  color: 'var(--muted)',
+                  padding: 0,
+                }}
+              >
+                🔄
+              </button>
+            )}
+          </div>
         </div>
 
         {loading && <p>Loading intelligence...</p>}
