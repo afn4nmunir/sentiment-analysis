@@ -98,20 +98,8 @@ export default function Dashboard() {
   const stats = useMemo(() => {
     const activeRows = rows.filter(r => !IGNORED_SOURCES.includes(r.Subreddit));
 
-    const sourceCounts = {};
-    activeRows.forEach(r => {
-      const src = r.Subreddit;
-      sourceCounts[src] = (sourceCounts[src] || 0) + 1;
-    });
-    const uniqueSources = Object.keys(sourceCounts).sort((a, b) => sourceCounts[b] - sourceCounts[a]);
-
-    const sourceFiltered =
-      selectedSource === 'All'
-        ? activeRows
-        : activeRows.filter(r => r.Subreddit === selectedSource);
-
-    const visibleRows = searchQuery.trim()
-      ? sourceFiltered.filter(r => {
+    const searchFilteredRows = searchQuery.trim()
+      ? activeRows.filter(r => {
         const q = searchQuery.toLowerCase();
         return (
           r.Title?.toLowerCase().includes(q) ||
@@ -121,7 +109,20 @@ export default function Dashboard() {
           r.Emotion?.toLowerCase().includes(q)
         );
       })
-      : sourceFiltered;
+      : activeRows;
+
+    const sourceCounts = {};
+    searchFilteredRows.forEach(r => {
+      const src = r.Subreddit;
+      sourceCounts[src] = (sourceCounts[src] || 0) + 1;
+    });
+
+    const uniqueSources = Object.keys(sourceCounts).sort((a, b) => sourceCounts[b] - sourceCounts[a]);
+
+    const visibleRows =
+      selectedSource === 'All'
+        ? searchFilteredRows
+        : searchFilteredRows.filter(r => r.Subreddit === selectedSource);
 
     const topicMap = {};
     const emotionMap = {};
@@ -231,23 +232,46 @@ export default function Dashboard() {
           <span style={{ color: 'var(--muted)' }}>{stats.visibleRows.length} insights</span>
         </div>
 
-        <input
-          type="text"
-          placeholder="Search posts, keywords, or sources…"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            marginTop: '1px',
-            marginBottom: '20px',
-            width: '100%',
-            padding: '10px 24px',
-            borderRadius: '10px',
-            border: '1px solid var(--border)',
-            fontSize: '0.9rem',
-            outline: 'none',
-            background: 'var(--panel)',
-          }}
-        />
+        <div style={{ position: 'relative', width: '100%', marginBottom: '20px' }}>
+          <input
+            type="text"
+            placeholder="Search posts, keywords, or sources…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              marginTop: '1px',
+              width: '100%',
+              padding: '10px 40px 10px 24px',
+              borderRadius: '10px',
+              border: '1px solid var(--border)',
+              fontSize: '0.9rem',
+              outline: 'none',
+              background: 'var(--panel)',
+            }}
+          />
+
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              title="Clear search"
+              style={{
+                position: 'absolute',
+                right: '14px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                color: 'var(--muted)',
+                padding: 0,
+              }}
+            >
+              🔄
+            </button>
+          )}
+        </div>
+
         {loading && <p>Loading intelligence...</p>}
         {error && <p style={{ color: 'red' }}>Error: {error}</p>}
         {!loading && stats.visibleRows.length === 0 && (
