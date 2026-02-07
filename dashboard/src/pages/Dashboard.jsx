@@ -14,21 +14,24 @@ export default function Dashboard() {
     "NgeeAnnPoly",
     "nanyangpoly",
     "republicpolytechnic",
-    "NYP", 
+    "NYP",
   ];
 
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [topicChartType, setTopicChartType] = useState('bar'); 
-  const [emotionChartType, setEmotionChartType] = useState('bar'); 
-  const [selectedSource, setSelectedSource] = useState('All');     
+  const [topicChartType, setTopicChartType] = useState('bar');
+  const [emotionChartType, setEmotionChartType] = useState('bar');
+  const [selectedSource, setSelectedSource] = useState('All');
 
   const [selectedPost, setSelectedPost] = useState(null);
-  const [expandedChart, setExpandedChart] = useState(null); 
-  
+  const [expandedChart, setExpandedChart] = useState(null);
+
   const [mobileView, setMobileView] = useState('feed');
+
+  const [searchQuery, setSearchQuery] = useState('');
+
 
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -94,7 +97,7 @@ export default function Dashboard() {
 
   const stats = useMemo(() => {
     const activeRows = rows.filter(r => !IGNORED_SOURCES.includes(r.Subreddit));
-    
+
     const sourceCounts = {};
     activeRows.forEach(r => {
       const src = r.Subreddit;
@@ -102,7 +105,23 @@ export default function Dashboard() {
     });
     const uniqueSources = Object.keys(sourceCounts).sort((a, b) => sourceCounts[b] - sourceCounts[a]);
 
-    const visibleRows = selectedSource === 'All' ? activeRows : activeRows.filter(r => r.Subreddit === selectedSource);
+    const sourceFiltered =
+      selectedSource === 'All'
+        ? activeRows
+        : activeRows.filter(r => r.Subreddit === selectedSource);
+
+    const visibleRows = searchQuery.trim()
+      ? sourceFiltered.filter(r => {
+        const q = searchQuery.toLowerCase();
+        return (
+          r.Title?.toLowerCase().includes(q) ||
+          r.Body?.toLowerCase().includes(q) ||
+          r.Subreddit?.toLowerCase().includes(q) ||
+          r.Category?.toLowerCase().includes(q) ||
+          r.Emotion?.toLowerCase().includes(q)
+        );
+      })
+      : sourceFiltered;
 
     const topicMap = {};
     const emotionMap = {};
@@ -129,13 +148,13 @@ export default function Dashboard() {
     const volPos = Math.round((posCount / (posCount + negCount || 1)) * 100);
     const volNeg = Math.round((negCount / (posCount + negCount || 1)) * 100);
 
-    const timeMap = {}; 
+    const timeMap = {};
     visibleRows.forEach(row => {
       const dateObj = new Date(row.Date);
       if (!isNaN(dateObj)) {
         const dateKey = `${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
         if (!timeMap[dateKey]) {
-           timeMap[dateKey] = { date: dateKey, positive: 0, negative: 0, stress: 0, happy: 0, confusion: 0, frustration: 0 };
+          timeMap[dateKey] = { date: dateKey, positive: 0, negative: 0, stress: 0, happy: 0, confusion: 0, frustration: 0 };
         }
         if (row.Sentiment > 0) timeMap[dateKey].positive++;
         else if (row.Sentiment < 0) timeMap[dateKey].negative++;
@@ -145,32 +164,32 @@ export default function Dashboard() {
       }
     });
 
-    const trendData = Object.values(timeMap).sort((a, b) => 
-       new Date(a.date).getTime() - new Date(b.date).getTime()
+    const trendData = Object.values(timeMap).sort((a, b) =>
+      new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
     return {
       topics, emotions, volPos, volNeg, posCount, negCount,
       uniqueSources, sourceCounts, visibleRows, trendData
     };
-  }, [rows, selectedSource]);
+  }, [rows, selectedSource, searchQuery]);
 
   return (
     <div className="fy-dashboard">
-      
+
       {/* 1. LEFT SIDEBAR (Sources) */}
       <aside className={`fy-left ${mobileView === 'sources' ? 'active-mobile' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
           {/* The Logo Image */}
           <img src="/InSight-Logo.png" alt="InSight-Logo" style={{ width: '40px', height: '40px' }} />
-          
+
           {/* The Text */}
-          <h1 style={{ 
-            color: 'var(--brand)', 
-            margin: 0, 
-            fontSize: '2rem', 
-            fontWeight: '800', 
-            letterSpacing: '-1px' 
+          <h1 style={{
+            color: 'var(--brand)',
+            margin: 0,
+            fontSize: '2rem',
+            fontWeight: '800',
+            letterSpacing: '-1px'
           }}>
             InSight
           </h1>
@@ -211,8 +230,32 @@ export default function Dashboard() {
           <h2 style={{ margin: 0 }}>Active Intelligence</h2>
           <span style={{ color: 'var(--muted)' }}>{stats.visibleRows.length} insights</span>
         </div>
+
+        <input
+          type="text"
+          placeholder="Search posts, keywords, or sources…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            marginTop: '1px',
+            marginBottom: '20px',
+            width: '100%',
+            padding: '10px 24px',
+            borderRadius: '10px',
+            border: '1px solid var(--border)',
+            fontSize: '0.9rem',
+            outline: 'none',
+            background: 'var(--panel)',
+          }}
+        />
         {loading && <p>Loading intelligence...</p>}
         {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+        {!loading && stats.visibleRows.length === 0 && (
+          <p style={{ color: 'var(--muted)', marginTop: '20px' }}>
+            No posts match your search.
+          </p>
+        )}
+
         {stats.visibleRows.map((row) => (
           <div key={row.id} className="fy-card" onClick={() => setSelectedPost(row)} style={{ cursor: 'pointer', transition: 'transform 0.1s' }}>
             <div className="post-meta">
@@ -234,7 +277,7 @@ export default function Dashboard() {
             </div>
           </div>
         ))}
-        <div style={{ height: '80px' }}></div> 
+        <div style={{ height: '80px' }}></div>
       </main>
 
       {/* 3. RIGHT SIDEBAR (Analytics) */}
@@ -253,20 +296,20 @@ export default function Dashboard() {
         </div>
 
         <div className="fy-panel" style={{ cursor: 'pointer' }} onClick={() => setExpandedChart('emotion')}>
-           <div className="chart-header">
+          <div className="chart-header">
             <span>Emotional Landscape</span>
-            <div className="toggle-group" style={{background: '#f1f5f9', padding: '2px', borderRadius: '6px', display: 'flex'}}>
-                <button onClick={(e) => { e.stopPropagation(); setEmotionChartType('bar'); }} style={toggleStyle(emotionChartType, 'bar')}>Bar</button>
-                <button onClick={(e) => { e.stopPropagation(); setEmotionChartType('pie'); }} style={toggleStyle(emotionChartType, 'pie')}>Pie</button>
-                <button onClick={(e) => { e.stopPropagation(); setEmotionChartType('trend'); }} style={toggleStyle(emotionChartType, 'trend')}>Trend</button>
+            <div className="toggle-group" style={{ background: '#f1f5f9', padding: '2px', borderRadius: '6px', display: 'flex' }}>
+              <button onClick={(e) => { e.stopPropagation(); setEmotionChartType('bar'); }} style={toggleStyle(emotionChartType, 'bar')}>Bar</button>
+              <button onClick={(e) => { e.stopPropagation(); setEmotionChartType('pie'); }} style={toggleStyle(emotionChartType, 'pie')}>Pie</button>
+              <button onClick={(e) => { e.stopPropagation(); setEmotionChartType('trend'); }} style={toggleStyle(emotionChartType, 'trend')}>Trend</button>
             </div>
-             <button style={{ marginLeft: '10px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '1.2rem' }}>⤢</button>
+            <button style={{ marginLeft: '10px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '1.2rem' }}>⤢</button>
           </div>
-           <div style={{minHeight: '180px', width: '100%'}}>
-             {emotionChartType === 'bar' && <MiniBarChart data={stats.emotions} color="#7c3aed" />}
-             {emotionChartType === 'pie' && <MiniPieChart data={stats.emotions} />}
-             {emotionChartType === 'trend' && <MiniTrendChart data={stats.trendData} keys={stats.emotions.slice(0, 5).map(e => e.name)} />}
-           </div>
+          <div style={{ minHeight: '180px', width: '100%' }}>
+            {emotionChartType === 'bar' && <MiniBarChart data={stats.emotions} color="#7c3aed" />}
+            {emotionChartType === 'pie' && <MiniPieChart data={stats.emotions} />}
+            {emotionChartType === 'trend' && <MiniTrendChart data={stats.trendData} keys={stats.emotions.slice(0, 5).map(e => e.name)} />}
+          </div>
         </div>
 
         <div className="fy-panel" style={{ background: '#1e293b', color: 'white', cursor: 'pointer' }} onClick={() => setExpandedChart('sentiment')}>
@@ -295,20 +338,20 @@ export default function Dashboard() {
       </aside>
 
       <div className="mobile-nav">
-        <button 
-          className={mobileView === 'sources' ? 'active' : ''} 
+        <button
+          className={mobileView === 'sources' ? 'active' : ''}
           onClick={() => setMobileView('sources')}
         >
           Sources
         </button>
-        <button 
-          className={mobileView === 'feed' ? 'active' : ''} 
+        <button
+          className={mobileView === 'feed' ? 'active' : ''}
           onClick={() => setMobileView('feed')}
         >
           Feed
         </button>
-        <button 
-          className={mobileView === 'analytics' ? 'active' : ''} 
+        <button
+          className={mobileView === 'analytics' ? 'active' : ''}
           onClick={() => setMobileView('analytics')}
         >
           Analytics
@@ -318,19 +361,19 @@ export default function Dashboard() {
       <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />
       {expandedChart === 'emotion' && (
         <ChartModal title="Emotional Landscape Analytics" onClose={() => setExpandedChart(null)}>
-           <h4 style={{marginTop: 0, color: '#64748b'}}>Trend Analysis (Expanded View)</h4>
-           <BigTrendChart 
-              data={stats.trendData} 
-              keys={stats.emotions.slice(0, 5).map(e => e.name)} 
-           />
+          <h4 style={{ marginTop: 0, color: '#64748b' }}>Trend Analysis (Expanded View)</h4>
+          <BigTrendChart
+            data={stats.trendData}
+            keys={stats.emotions.slice(0, 5).map(e => e.name)}
+          />
         </ChartModal>
       )}
       {expandedChart === 'sentiment' && (
         <ChartModal title="Sentiment Breakdown by Post" onClose={() => setExpandedChart(null)} theme="dark">
-           <p style={{color: '#94a3b8', marginBottom: '20px'}}>
-             Visualizing the positive vs negative impact of the last 30 posts.
-           </p>
-           <SentimentBreakdownChart data={stats.visibleRows} />
+          <p style={{ color: '#94a3b8', marginBottom: '20px' }}>
+            Visualizing the positive vs negative impact of the last 30 posts.
+          </p>
+          <SentimentBreakdownChart data={stats.visibleRows} />
         </ChartModal>
       )}
     </div>
