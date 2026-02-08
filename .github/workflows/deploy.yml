@@ -19,6 +19,8 @@ jobs:
         with:
           node-version: 20
 
+      - working-directory: ./dashboard
+
       - name: Install Vite
         run: npm install vite
 
