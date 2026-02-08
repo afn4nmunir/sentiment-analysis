@@ -19,7 +19,11 @@ jobs:
         with:
           node-version: 20
 
-      - run: npm install
+      - name: Navigate to dashboard directory
+        run: cd dashboard
+        
+      - name: Install dependencies
+        run: npm install
 
       - run: npm run build
         env:
