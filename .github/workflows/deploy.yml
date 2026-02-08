@@ -19,9 +19,9 @@ jobs:
         with:
           node-version: 20
 
-      - name: Navigate to dashboard directory
-        run: cd dashboard
-        
+      - name: Install Vite
+        run: npm install vite
+
       - name: Install dependencies
         run: npm install
 
