@@ -1,0 +1,29 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: api-keys
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+
+      - run: npm run build
+        env:
+          VITE_AWS_SENTIMENT_URL: ${{ secrets.AWS_SENTIMENT_URL }}
+          VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
+
+      - run: npx gh-pages -d dist

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { MiniBarChart, MiniPieChart, Pill, SentimentPill, MiniTrendChart, SentimentBreakdownChart, BigTrendChart } from "../components/Charts";
 import PostModal from '../components/PostModal';
 import ChartModal from '../components/ChartModal';
+import logo from '../assets/InSight-Logo.png';
 
 export default function Dashboard() {
   const PREVIEW_LENGTH = 200;
@@ -206,7 +207,7 @@ export default function Dashboard() {
       <aside className={`fy-left ${mobileView === 'sources' ? 'active-mobile' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
           {/* The Logo Image */}
-          <img src="/InSight-Logo.png" alt="InSight-Logo" style={{ width: '40px', height: '40px' }} />
+          <img src={logo} alt="InSight Logo" style={{ width: '40px', height: '40px' }} />
 
           {/* The Text */}
           <h1 style={{
